@@ -1,4 +1,4 @@
-/*  ArduinoFor2Lasers.ino rev 5/30/2020 Tom
+/*  ArduinoFor2Lasers.ino rev 5/31/2020 Tom
 * Monitor two inputs from two Laser machines Lily and Daniel at Technology for Humankind
 * One input indicates the laser is firing. The other input indicates the lid is raised
 * Output to a set of Neopixel Lights the status of the laser according to the inputs.
@@ -14,7 +14,7 @@
   #include <avr/power.h>
 #endif
 
-#define PIN            6
+#define PIN            9
 // How many NeoPixels are attached to the Arduino?
 #define NUMPIXELS      10
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
@@ -56,46 +56,46 @@ void setup() {
 void loop() {
   unsigned long currentMillis = millis();
   // Photocell 0 ---------------------
-  //if(Debug)Serial.println(analogRead(A0));
-  //if(Debug){Serial.print(avgLaser0,DEC);Serial.print(" . ");}
-  int valLaser0 = (analogRead(A0) >= 40 ? 1000 : 0);
+   int valLaser0 = (analogRead(A0) >= 200 ? 1000 : 0);
   avgLaser0 = ((19*avgLaser0) + valLaser0) / 20;
   lightOff0 = (avgLaser0 < 980);
+  //if(Debug)Serial.println(analogRead(A0));
+  //if(Debug){Serial.print(avgLaser0,DEC);Serial.print(" . ");}
 
   // Photocell 1 ---------------------
-  //if(Debug)Serial.println(analogRead(A1));
-  if(Debug){Serial.println(avgLaser1,DEC);Serial.print(" . ");}
-  int valLaser1 = (analogRead(A1) >= 40 ? 1000 : 0);
+  int valLaser1 = (analogRead(A1) >= 330 ? 1000 : 0);
   avgLaser1 = ((19*avgLaser1) + valLaser1) / 20;
   lightOff1 = (avgLaser1 < 980);
+  //if(Debug)Serial.println(analogRead(A1));
+  //if(Debug){Serial.println(avgLaser1,DEC);Serial.print(" . ");}
 
   //Tilt Sensor 0 --------------
-  //if(Debug){Serial.print(avg0,DEC);Serial.print(" . ");}
-  int val0 = digitalRead(2)*1000;
+  int val0 = !digitalRead(2)*1000;
   avg0 = ((9*avg0)+val0)/10;
   isOpen0 = (avg0 > 100);
+  //if(Debug){Serial.print(avg0,DEC);Serial.print(" . ");}
   
   //Tilt Sensor 1 --------------
-  //if(Debug){Serial.print(avg1,DEC);Serial.print(" . ");}
   int val1 = digitalRead(3)*1000;
   avg1 = ((9*avg1)+val1)/10;
   isOpen1 = (avg1 > 100);
+  //if(Debug){Serial.print(avg1,DEC);Serial.print(" . ");}
 
   //Laser0 Timoout Flash -------------------
-  //if(Debug){Serial.print(lightOff0,DEC);Serial.print(" ");}
   if(lightOff0 || isOpen0){
     endTime0 = millis() + LaserTimeout;
     endTimeBell = millis() + AlarmTimeout;
     Blink0 = 0;
   }else if(currentMillis > endTime0){Blink0 = !Blink0;}
+  //if(Debug){Serial.print(lightOff0,DEC);Serial.print(" ");}
   
   //Laser1 Timoout Flash -------------------
-  if(Debug){Serial.print(lightOff1,DEC);Serial.print(" ");}
   if(lightOff1 || isOpen1){
     endTime1 = millis() + LaserTimeout;
     endTimeBell = millis() + AlarmTimeout;
     Blink1 = 0;
   }else if(currentMillis > endTime1){Blink1 = !Blink1;}
+  //if(Debug){Serial.print(lightOff1,DEC);Serial.print(" ");}
 
   //Alarm Timeout --------------
   if(currentMillis > endTimeBell){
